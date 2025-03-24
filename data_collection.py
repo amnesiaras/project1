@@ -55,7 +55,7 @@ conversion_rate = pd.DataFrame(result_conversion_rate)
 conversion_rate["date"] = pd.to_datetime(conversion_rate["date"])
 conversion_rate.drop("id",axis=1,inplace=True)
 
-
+# Merge ข้อมูลจาก Database และ API เข้าด้วยกัน
 final_merge = merged_transaction.merge(conversion_rate,how="left",left_on="Date",right_on="date")
 final_merge["THB_price_total"] = final_merge["Price"] * final_merge["Quantity"] * final_merge["gbp_thb"]
 final_merge.drop(["date","gbp_thb"] ,axis=1,inplace=True)
