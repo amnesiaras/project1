@@ -89,8 +89,22 @@ def workshop_pipeline():
         conversion_rate_path = conversion_rate_output_path, 
         output_path = final_output_path
         )
+    # option 1: สร้าง t4 ที่เป็น GCSToBigQueryOperator เพื่อใช้งานกับ BigQuery แบบ Airflow และใส่ dependencies
+    t4 = GCSToBigQueryOperator(
+        task_id = "gcs_to_bq_example",
+        bucket="us-central1-workshop5-7ac892d3-bucket",
+        source_objects=["data/workshop4_output.parquet"],
+        source_format="PARQUET",
+        destination_project_dataset_table="workshop.transaction1",
+        write_disposition="WRITE_TRUNCATE"
+    )
+    # option 2: สร้าง t4 ที่เป็น BashOperator เพื่อใช้งานกับ BigQuery และใส่ dependencies
+    # t4 = BashOperator(
+    #     task_id = "bq_load",
+    #     bash_command="bq load --source_format=PARQUET workshop.transaction gs://us-central1-workshop5-7ac892d3-bucket/data/workshop4_output.parquet"
+    # ) 
 
-    # สร้าง dependency ให้ถูกต้อง (ต้องรัน task 3 หลังจาก 1 และ 2 เสร็จเท่านั้น)
-    [t1,t2] >> t3
+    # สร้าง dependency
+    [t1,t2] >> t3 >> t4
 
 workshop_pipeline()
